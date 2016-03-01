@@ -235,10 +235,10 @@ var AvatarEditor = React.createClass({
         imageRatio = height / width;
 
         if (canvasRatio > imageRatio) {
-            newHeight = (this.getDimensions().canvas.height);
+            newHeight = (this.getDimensions().height);
             newWidth = (width * (newHeight / height));
         } else {
-            newWidth = (this.getDimensions().canvas.width);
+            newWidth = (this.getDimensions().width);
             newHeight = (height * (newWidth / width));
         }
 
