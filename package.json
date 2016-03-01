@@ -44,7 +44,7 @@
         "watchify": "^3.2.2"
     },
     "hudl-ci": {
-      "buildCommand": "npm run build",
+      "buildCommand": "npm run build"
     },
     "publishConfig": {
       "registry": "http://npm.thorhudl.com"
