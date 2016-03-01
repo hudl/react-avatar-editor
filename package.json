@@ -42,5 +42,11 @@
         "reactify": "0.17.1",
         "uglifyjs": "^2.4.10",
         "watchify": "^3.2.2"
+    },
+    "hudl-ci": {
+      "buildCommand": "npm run build",
+    },
+    "publishConfig": {
+      "registry": "http://npm.thorhudl.com"
     }
 }
