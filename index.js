@@ -77,11 +77,13 @@ var AvatarEditor = React.createClass({
         height: React.PropTypes.number,
         color: React.PropTypes.arrayOf(React.PropTypes.number),
         style: React.PropTypes.object,
+        slice: React.PropTypes.oneOf(['vertical', 'horizontal']),
 
         onDropFile: React.PropTypes.func,
         onLoadFailure: React.PropTypes.func,
         onLoadSuccess: React.PropTypes.func,
         onImageReady: React.PropTypes.func,
+        onMouseDown: React.PropTypes.func,
         onMouseUp: React.PropTypes.func
     },
 
@@ -94,10 +96,12 @@ var AvatarEditor = React.createClass({
             height: 200,
             color: [0, 0, 0, 0.5],
             style: {},
+            slice: null,
             onDropFile() {},
             onLoadFailure() {},
             onLoadSuccess() {},
             onImageReady() {},
+            onMouseDown() {},
             onMouseUp() {}
         }
     },
@@ -115,13 +119,16 @@ var AvatarEditor = React.createClass({
     },
 
     getDimensions() {
+        var borderSize = this.props.border;
+        var borderX = this.props.slice === 'horizontal' ? 0 : borderSize;
+        var borderY = this.props.slice === 'vertical' ? 0 : borderSize;
         return {
             width: this.props.width,
             height: this.props.height,
             border: this.props.border,
             canvas: {
-                width: this.props.width + (this.props.border * 2),
-                height: this.props.height + (this.props.border * 2)
+                width: this.props.width + (borderX * 2),
+                height: this.props.height + (borderY * 2)
             }
         }
     },
@@ -145,6 +152,13 @@ var AvatarEditor = React.createClass({
     getCroppingRect() {
         var dim = this.getDimensions();
         var frameRect = {x: dim.border, y: dim.border, width: dim.width, height: dim.height};
+        if (this.props.slice === 'horizontal') {
+            frameRect.width = frameRect.width + 2 * dim.border;
+            frameRect.x = 0;
+        } else if (this.props.slice === 'vertical') {
+            frameRect.height = frameRect.height + 2 * dim.border;
+            frameRect.y = 0;
+        }
         var imageRect = this.calculatePosition(this.state.image, dim.border);
         return {
             x: (frameRect.x - imageRect.x) / imageRect.width,
@@ -269,8 +283,16 @@ var AvatarEditor = React.createClass({
 
         var widthDiff = (width - dimensions.width) / 2;
         var heightDiff = (height - dimensions.height) / 2;
-        x = image.x * this.props.scale - widthDiff + border;
-        y = image.y * this.props.scale - heightDiff + border;
+        if (this.props.slice === 'horizontal') {
+            x = image.x * this.props.scale - widthDiff;
+            y = image.y * this.props.scale - heightDiff + border;
+        } else if (this.props.slice === 'vertical') {
+            x = image.x * this.props.scale - widthDiff + border;
+            y = image.y * this.props.scale - heightDiff;
+        } else {
+            x = image.x * this.props.scale - widthDiff + border;
+            y = image.y * this.props.scale - heightDiff + border;
+        }
 
         return {
             x: x,
@@ -288,6 +310,8 @@ var AvatarEditor = React.createClass({
         var dimensions = this.getDimensions();
 
         var borderSize = dimensions.border;
+        var borderX = this.props.slice === 'horizontal' ? 0 : borderSize;
+        var borderY = this.props.slice === 'vertical' ? 0 : borderSize;
         var borderRadius = this.props.borderRadius;
         var height = dimensions.canvas.height;
         var width = dimensions.canvas.width;
@@ -297,9 +321,9 @@ var AvatarEditor = React.createClass({
         borderRadius = Math.min(borderRadius, width/2 - borderSize, height/2 - borderSize);
         
         context.beginPath();
-        drawRoundedRect(context, borderSize, borderSize, width - borderSize*2, height - borderSize*2, borderRadius); // inner rect, possibly rounded
+        drawRoundedRect(context, borderX, borderY, width - borderX*2, height - borderY*2, borderRadius); // inner rect, possibly rounded
         context.rect(width, 0, -width, height); // outer rect, drawn "counterclockwise"
-        context.fill();
+        context.fill('evenodd');
 
         context.restore();
     },
@@ -315,6 +339,7 @@ var AvatarEditor = React.createClass({
             mx: null,
             my: null
         });
+        this.props.onMouseDown();
     },
     handleMouseUp() {
         if (this.state.drag) {
