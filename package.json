@@ -47,6 +47,6 @@
     "buildCommand": "npm run build"
   },
   "publishConfig": {
-    "registry": "http://npm.thorhudl.com"
+    "registry": "http://npm-push.hudltools.com"
   }
 }
