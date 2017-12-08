@@ -40,7 +40,7 @@
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
     "reactify": "0.17.1",
-    "uglifyjs": "^2.4.10",
+    "uglify-js": "3.2.1",
     "watchify": "^3.2.2"
   },
   "hudl-ci": {
